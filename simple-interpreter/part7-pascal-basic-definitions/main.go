@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"unicode"
 
 	"github.com/pkg/errors"
@@ -137,13 +138,23 @@ func (l *lexer) skipComments() {
 	l.advance()
 }
 
-func (l *lexer) lexInteger() string {
-	integer := ""
+func (l *lexer) lexNumber() string {
+	number := ""
 	for unicode.IsDigit(rune(l.peek())) {
-		integer += string(l.peek())
+		number += string(l.peek())
 		l.advance()
 	}
-	return integer
+
+	if l.peek() == '.' {
+		number += "."
+		l.advance()
+		for unicode.IsDigit(rune(l.peek())) {
+			number += string(l.peek())
+			l.advance()
+		}
+	}
+
+	return number
 }
 
 func (l *lexer) lexIdentifier() string {
@@ -160,12 +171,6 @@ func (l *lexer) currentToken() token {
 	return l.tok
 }
 
-// case 1: skip whitespaces
-// case 2: multiple digit
-// case 3: supports + and -
-// case 4: supports * and /
-// case 5: supports ( and )
-// case 6: supports BEGIN END DOT SEMI := and identifier
 func (l *lexer) nextToken() {
 	// Try to lexize each token in one loop.
 	// For spaces, it will locate to the first non-space and restart lexize again.
@@ -183,9 +188,13 @@ func (l *lexer) nextToken() {
 		}
 
 		if unicode.IsDigit(rune(ch)) {
-			value := l.lexInteger()
+			value := l.lexNumber()
+			tokType := tokLiteralInteger
+			if strings.Contains(value, ".") {
+				tokType = tokLiteralReal
+			}
 			l.tok = token{
-				kind:  tokLiteralInteger,
+				kind:  tokType,
 				value: value,
 			}
 			return
@@ -215,6 +224,16 @@ func (l *lexer) nextToken() {
 				kind:  tokMul,
 				value: "*",
 			}
+			return
+		}
+
+		if ch == '/' && l.peekNext() == '/' {
+			l.tok = token{
+				kind: tokDivReal,
+				value: "//",
+			}
+			l.advance()
+			l.advance()
 			return
 		}
 
@@ -283,6 +302,24 @@ func (l *lexer) nextToken() {
 				value: ":=",
 			}
 			l.advance()
+			l.advance()
+			return
+		}
+
+		if ch == ':' && l.peekNext() != '=' {
+			l.tok = token {
+				kind: tokColon,
+				value: ":",
+			}
+			l.advance()
+			return
+		}
+
+		if ch == ',' {
+			l.tok = token{
+				kind: tokComma,
+				value: ",",
+			}
 			l.advance()
 			return
 		}
