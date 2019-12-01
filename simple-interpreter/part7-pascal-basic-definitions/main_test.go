@@ -62,11 +62,166 @@ func TestLexer_PascalDefinitions(t *testing.T) {
 
 		lex.nextToken()
 		tok = lex.currentToken()
-		c.So(tok, convey.ShouldResemble, token{kind: tokSymbol, value:"_foo_bar"})
+		c.So(tok, convey.ShouldResemble, token{kind: tokSymbol, value: "_foo_bar"})
 
 		lex.nextToken()
 		tok = lex.currentToken()
-		c.So(tok, convey.ShouldResemble, token{kind: tokAssign, value:":="})
+		c.So(tok, convey.ShouldResemble, token{kind: tokAssign, value: ":="})
+	})
+
+	convey.Convey("", t, func(c convey.C) {
+		text :=
+			`PROGRAM test;
+VAR
+	number : INTEGER;
+	x, y, z : INTEGER;
+	gg : REAL;
+BEGIN
+	z := x / y;
+	gg := number // z;
+END.`
+		lex := newLexer(text)
+		var tok token
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, *_Reserved["PROGRAM"])
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokSymbol, value: "test"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokSemi, value: ";"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, *_Reserved["VAR"])
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokSymbol, value: "number"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokColon, value: ":"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, *_Reserved["INTEGER"])
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokSemi, value: ";"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokSymbol, value: "x"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokComma, value: ","})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokSymbol, value: "y"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokComma, value: ","})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokSymbol, value: "z"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokColon, value: ":"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, *_Reserved["INTEGER"])
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokSemi, value: ";"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokSymbol, value: "gg"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokColon, value: ":"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, *_Reserved["REAL"])
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokSemi, value: ";"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, *_Reserved["BEGIN"])
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokSymbol, value: "z"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokAssign, value: ":="})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokSymbol, value: "x"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokDivInteger, value: "/"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokSymbol, value: "y"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokSemi, value: ";"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokSymbol, value: "gg"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokAssign, value: ":="})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokSymbol, value: "number"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokDivReal, value: "//"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokSymbol, value: "z"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokSemi, value: ";"})
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, *_Reserved["END"])
+		lex.nextToken()
+
+		tok = lex.currentToken()
+		c.So(tok, convey.ShouldResemble, token{kind: tokDot, value: "."})
+		lex.nextToken()
 	})
 }
 

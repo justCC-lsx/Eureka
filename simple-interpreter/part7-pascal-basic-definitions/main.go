@@ -83,7 +83,7 @@ func (t *token) asInt() (int, error) {
 }
 
 func isSpace(ch byte) bool {
-	return ch == ' ' || ch == '\t'
+	return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'
 }
 
 type lexer struct {
